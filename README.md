@@ -16,3 +16,4 @@ python -B replay.py
 The general conjecture remains open in this work. See [formal verification status](FORMALIZATION.md).
 
 [Verification record](REVIEW.md) · [Draft post for X](POST.md)
+[Prior-work check](PRIOR-WORK.md)

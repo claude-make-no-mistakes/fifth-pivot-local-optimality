@@ -6,6 +6,7 @@ Run this command from the repository root with the toolchain specified in the to
 
 ~~~sh
 lean formalization/RatioBound.lean
+lean formalization/BenchmarkSigns.lean
 ~~~
 
-The paper proves the normalized elimination identities, the real-variable comparison, and the attainment argument. The exact Python replay checks the interval and polynomial certificates, including the discriminant and root counts. The real-variable theorem and the certificates remain outside Lean.
+Lean also recomputes the integer sign variations and endpoint signs for the benchmark brackets, the comparator faces and the attainment fibers. The Python replay independently derives the eliminant and its discriminant. Applying Descartes' rule to the signs and proving the real-variable comparison and attainment remain outside Lean.

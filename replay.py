@@ -45,6 +45,7 @@ def main():
     require_same(json.loads(run("pivot/region.py")), read_json(HERE / "pivot/region.json"), "pivot box")
     comparator = json.loads(run("pivot/comparator.py"))
     require_same(comparator, read_json(HERE / "pivot/comparator.json"), "pivot comparator")
+    print(run("verification/check_lean_inputs.py").strip(), flush=True)
     print(run("verification/pivot_subbox.py").strip(), flush=True)
     print(run("verification/pivot_attainment.py").strip(), flush=True)
     print("Pivot benchmark, exact witness, box exclusion and sharpness checks reproduced.")
