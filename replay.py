@@ -1,4 +1,4 @@
-"""Replay the campaign's exact certificates. Run with Python 3.12 and SymPy 1.14."""
+"""Replay the exact verification certificates. Run with Python 3.12 and SymPy 1.14."""
 
 from hashlib import sha256
 import json

@@ -78,7 +78,7 @@ The interval checker verifies \(a,b,e-d,k,q,H_{11}>0\) and \(y<0\) throughout th
 
 Set \(P=H_{11}+H_{21}\), \(D=H_{22}-H_{11}\), and \(W=H_{11}+H_{22}\). On \(P=0\), \(p_5=W\). The interval certificate verifies all stage-1 through stage-3 dominance inequalities and \(W>0,\ P_x>0,\ P_y>0\) on the whole box. For every allowed \(z\), it encloses the \(P=0\) root at the left \(x\) endpoint in \([-0.778957,-0.778955]\) with \(D<0\) throughout that bracket. At the right \(x\) endpoint it encloses the root in \([-0.779307,-0.779304]\) with \(D>0\) throughout.
 
-At fixed \(z\), monotonicity in \(x\) propagates \(P<0\) from the right-face lower bracket endpoint to the entire low-\(y\) face. It propagates \(P>0\) from the left-face upper bracket endpoint to the entire high-\(y\) face. Since \(P_y>0\), the branch \(y(x)\) exists and is unique across the box. The implicit function theorem gives \(y'(x)=-P_x/P_y\). Rational interval arithmetic encloses \(D_x-D_yP_x/P_y\) in \((1.85,1.88)\) and \(W_x-W_yP_x/P_y\) in \((0.76,0.78)\).
+At fixed \(z\), monotonicity in \(x\) and \(y\) propagates \(P<0\) from the right-face lower bracket endpoint to the entire low-\(y\) face, and propagates \(P>0\) from the left-face upper bracket endpoint to the entire high-\(y\) face. Since \(P_y>0\), the branch \(y(x)\) exists and is unique across the box. The implicit function theorem gives \(y'(x)=-P_x/P_y\). Rational interval arithmetic encloses \(D_x-D_yP_x/P_y\) in \((1.85,1.88)\) and \(W_x-W_yP_x/P_y\) in \((0.76,0.78)\).
 
 The branch crosses \(D=0\) exactly once, at some \(x_0\). Since \(H_{11}>0\), every relaxed point has \(D<0\) and lies to its left. At \(x_0\), the block \(H\) satisfies all three prescribed ties and stage-4 dominance, and the earlier stages satisfy dominance by the interval checks. The following calculation bounds its pivot by \(g_*\), giving \(p_5=W(x)<W(x_0)\le g_*\).
 
@@ -115,13 +115,13 @@ The local relaxed family has supremum \(g_*\), approached as \(r\) tends to 1. T
 
 This argument uses the stage entries directly, including at zeros of reconstruction denominators. Normalization gives \(x,z\in[-1,1]\) and \(a_{22}=1+x+z\in[-1,1]\). The retained ties yield \(F_{11}=b=1+z,\ G_{11}=q=2-z(x+z)\), and \(G_{12}=-z(1+x)\) without dividing by \(1+x,y,e-d\), or \(k\). Since \(b\ne0\) and \(x+z\in[-2,0]\), both \(b\) and \(q\) are positive.
 
-Write \(s=G_{31}\). The ties \(G_{32}=-q\) and \(H_{21}=-H_{11}\) give
+Write \(w=G_{31}\). The ties \(G_{32}=-q\) and \(H_{21}=-H_{11}\) give
 
 \[
-H_{11}=q+sG_{12}/q>0.
+H_{11}=q+wG_{12}/q>0.
 \]
 
-Nonnegativity follows from \(|s|,|G_{12}|\le q\), and the pivot is nonzero. Thus \(p_5=(1+r)H_{11}\). For \(z\ge0\), \(H_{11}\le q+|G_{12}|=2+z(1-z)\). For \(z\le0\), \(q\le2\) and \(0\le G_{12}\le q\). The identities \(F_{22}=q+F_{12}\) and \(s=1-za_{13}+F_{12}\), together with \(F_{22}\le b\) and \(|a_{13}|\le1\), give \(s\le1+|z|+b-q=2-q\). Hence \(H_{11}\le2\) for \(z\le0\). The bound at \(z=1\) also gives \(H_{11}\le2\). These regimes have \(p_5<4\). In particular, a counterexample requires \(r>4g_*/9-1\), approximately \(0.83667\), and \(z(1-z)>g_*/2-2\).
+Nonnegativity follows from \(|w|,|G_{12}|\le q\), and the pivot is nonzero. Thus \(p_5=(1+r)H_{11}>0\) (so \(|p_5|=p_5\)). For \(z\ge0\), \(H_{11}\le q+|G_{12}|=2+z(1-z)\). For \(z\le0\), \(q\le2\) and \(0\le G_{12}\le q\). The identities \(F_{22}=q+F_{12}\) and \(w=1-za_{13}+F_{12}\), together with \(F_{22}\le b\) and \(|a_{13}|\le1\), give \(w\le1+|z|+b-q=2-q\). Hence \(H_{11}\le2\) for \(z\le0\). The bound at \(z=1\) also gives \(H_{11}\le2\). These regimes have \(p_5<4\). In particular, a counterexample requires \(r>4g_*/9-1\), approximately \(0.83667\), and \(z(1-z)>g_*/2-2\).
 
 ## Replay
 
