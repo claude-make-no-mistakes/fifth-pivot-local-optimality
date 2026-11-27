@@ -2,320 +2,672 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
-\usepackage[margin=1in]{geometry}
-\usepackage{amsmath,amssymb,longtable,array,calc}
-\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue]{hyperref}
-\IfFileExists{booktabs.sty}{\usepackage{booktabs}}{%
-  \newcommand{\toprule}{\hline}
-  \newcommand{\midrule}{\hline}
-  \newcommand{\bottomrule}{\hline}
-}
-\setlength{\emergencystretch}{3em}
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{5pt}
+\usepackage[margin=0.95in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
 \allowdisplaybreaks
-\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\newcounter{none}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
 \title{A Sharp Local Bound for the Fifth Complete Pivot}
 \author{Claude Make No Mistakes}
-\date{25 November 2026 --- Working paper}
+\date{November 2026}
 
 \begin{document}
 \maketitle
+
 \begin{abstract}
-We relax one equality in the extremal pattern of Chen, Edelman and
-Urschel. Over a specified rational box the fifth pivot has supremum
-\(g_*\), the degree-61 benchmark, and attains it when the original tie
-is allowed. Exact interval and polynomial root certificates establish
-the result. A necessary inequality restricts challengers throughout the
-relaxed family.
+We study a one-tie relaxation of the extremal complete-pivoting pattern of
+Chen, Edelman, and Urschel for real $5\times 5$ matrices, retaining all
+fourteen prescribed initial $\pm 1$ entries and all stage-2, stage-3, and
+off-diagonal stage-4 ties while relaxing the final diagonal tie $H_{22}=H_{11}$
+to $-1\le r = H_{22}/H_{11} < 1$. Over an explicit rational parameter box
+$B$ surrounding the published extremal matrix, we prove via exact rational
+interval arithmetic, symbolic elimination, and exact polynomial root
+certification that every matrix in the relaxed family has fifth pivot strictly
+below the degree-61 benchmark $g_* \approx 4.13251707863247$, that the
+supremum over the relaxed family in $B$ equals $g_*$, and that $g_*$ is
+attained in $B$ when $r=1$ is permitted. We also certify an explicit algebraic
+witness in $B$ with $r \approx 0.999939320464152$ and
+$p_5 \approx 4.1324652818749806$, and we establish a global necessary
+inequality over the entire relaxed family: any counterexample with $|p_5|>g_*$
+must satisfy $0<z<1$ and $(1+r)(2+z(1-z))>g_*$, hence
+$r > 4g_*/9 - 1 \approx 0.83667$.
 \end{abstract}
 
-Every relaxed matrix in the box below has fifth pivot strictly below the
-benchmark \(g_*\). The relaxation keeps the signed entries and ties of
-equation (2.1) except for the fourth-stage ratio, which becomes
-\(-1\le r=H_{22}/H_{11}<1\). A certified point in the box has
-\(r\approx0.999939320464152\) and fifth pivot \(4.1324652818749806\).
-Across the full relaxed family, a counterexample requires \(0<z<1\) and
+\section{Introduction and Main Results}\label{sec:intro}
 
+In Gaussian elimination with complete pivoting on a real $5\times 5$ matrix
+$A$, one normalizes the initial matrix so that $A_{11}=1$ and
+$|A_{ij}|\le 1$ for all $i,j$, and requires at each elimination stage $k\in\{1,2,3,4\}$
+that the pivot $p_k = A^{(k)}_{11}$ is nonzero and dominates every entry of
+the remaining $(6-k)\times(6-k)$ Schur complement:
 \[
- (1+r)\bigl(2+z(1-z)\bigr)>g_*.
+|A^{(k)}_{ij}| \le |A^{(k)}_{11}| \qquad (1\le i,j\le 6-k).
 \]
+Chen, Edelman, and Urschel~\cite{CEU2026} introduced a structured equality
+pattern (their equation~(2.1)) and conjectured that the fifth pivot of every
+completely pivoted real $5\times 5$ matrix is bounded by a degree-61 algebraic
+number $g_* \approx 4.13251707863247$ (the unique root in $[4,5]$ of the
+integer polynomial $P_5$ in~\cite[eq.~(2.15)]{CEU2026}).
 
-The region outside the box that meets this necessary condition remains
-open here.
+Write the successive Schur complements as $F = A^{(2)}\in\mathbb{R}^{4\times 4}$,
+$G = A^{(3)}\in\mathbb{R}^{3\times 3}$, and $H = A^{(4)}\in\mathbb{R}^{2\times 2}$,
+indexing each stage from $1$, and let $p_5 = A^{(5)}_{11}$ denote the fifth
+pivot. We study the following one-tie relaxation of the pattern
+in~\cite[eq.~(2.1)]{CEU2026}:
+\begin{enumerate}
+  \item \emph{Fourteen prescribed initial entries:}
+  \begin{equation}\label{eq:template}
+  A = \begin{pmatrix}
+    1 & 1 & a_{13} & a_{14} & a_{15} \\
+    x & a_{22} & a_{23} & -1 & 1 \\
+    -1 & a_{32} & a_{33} & -1 & -1 \\
+    y & a_{42} & 1 & 1 & 1 \\
+    z & -1 & 1 & -1 & 1
+  \end{pmatrix},
+  \end{equation}
+  where we designate $x=A_{21}$, $y=A_{41}$, and $z=A_{51}$ as the free
+  parameters.
+  \item \emph{Nine retained Schur-complement ties:}
+  \begin{align*}
+    \text{Stage 2:}\quad & F_{21}=F_{11},\quad F_{23}=-F_{11},\quad
+                           F_{32}=F_{11},\quad F_{41}=-F_{11}, \\
+    \text{Stage 3:}\quad & G_{13}=-G_{11},\quad G_{21}=G_{11},\quad
+                           G_{32}=-G_{11}, \\
+    \text{Stage 4:}\quad & H_{12}=H_{11},\quad H_{21}=-H_{11}.
+  \end{align*}
+  \item \emph{Relaxed stage-4 diagonal ratio:} instead of imposing
+  $H_{22}=H_{11}$, we require
+  \[
+    -1 \le r := \frac{H_{22}}{H_{11}} < 1.
+  \]
+\end{enumerate}
+Let $\mathcal{F}_{<}$ denote the set of all real completely pivoted $5\times 5$
+matrices with nonzero pivots $p_1,\dots,p_5$ satisfying conditions~(1)--(3),
+and let $\mathcal{F}_{\le}$ denote the corresponding family when the boundary
+tie $r=1$ ($H_{22}=H_{11}$) is also permitted.
 
-\section{Benchmark and witness}\label{benchmark-and-witness}
+Throughout, every terminating decimal denotes an exact rational number. Define
+the closed rational parameter box $B = [x_L,x_R]\times[y_L,y_R]\times[z_L,z_R]$
+given in Table~\ref{tab:box}.
 
-The 62 coefficients in p5\_coefficients.txt agree term by term with
-equation (2.15) and Out{[}12{]} of the authors' discriminant notebook.
-An exact Möbius substitution and Descartes' rule certify one root on
-\([4,5]\), zero on \([-5,0]\), and the strict bracket
-
-\[
-4.132517078632472854223346853277 < g_* <
-4.132517078632472854223346853278.
-\]
-
-The exact full-equality control \(x=y=-1/2,\ z=0\) has pivots
-\(1,1,2,2,4\). The checker rejects this control under the strict \(r<1\)
-criterion and rejects controls with a wrong prescribed entry or a
-stage-1 dominance violation.
-\href{https://arxiv.org/html/2602.20390v2}{Paper, equation (2.15)} ·
-\href{https://github.com/jamiecjx/growth-5x5/blob/bd6d13af571d0c454178dac24e753f7cac7a3727/n\%3D5_discriminant.nb}{Authors'
-pinned discriminant notebook}
-
-The relaxed witness takes \(x=-386/625,\ z=18129/40000\) and \(y\) equal
-to the unique zero in \((-0.779073,-0.779072)\) of the cubic with
-descending coefficients
-
-\begin{verbatim}
-  3586674629163499482445312500000000000
-{-22693677055802856449945261748450390625}
-{-21794053267721803248556940294525366975}
- {-1509132804792772878470239805058936768}
-\end{verbatim}
-
-The checker compares every entry of the successive Schur complements
-with its independent bordered-determinant ratio from the original
-matrix. It proves all prescribed ties and both dominance slacks at every
-entry with arithmetic in the cubic field and exact rational intervals
-around the selected root. The certificate gives
-
-\[
-\begin{aligned}
-0.99993932046415197561 &< r < 0.99993932046415197562,\\
-4.13246528187498059056 &< p_5 < 4.13246528187498059057.
-\end{aligned}
-\]
-
-It archives the original matrix, five pivots, and all active signed
-entries.
-
-\section{Proof on the box}\label{proof-on-the-box}
-
-The parameters are \(x=A_{21},\ y=A_{41},\ z=A_{51}\). Every terminating
-decimal in the box proof is an exact rational.
-
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}ll@{}}
-\toprule\noalign{}
+\begin{table}[htbp]
+\centering
+\caption{The rational parameter box $B$ for $(x,y,z)=(A_{21},A_{41},A_{51})$.}
+\label{tab:box}
+\begin{tabular}{@{}ll@{}}
+\toprule
 Parameter & Closed interval \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\(x\) & \([-0.6177,-0.6174]\) \\
-\(y\) & \([-0.7794,-0.7789]\) \\
-\(z\) & \([0.45322490,0.45322501]\) \\
-\end{longtable}
-}
+\midrule
+$x = A_{21}$ & $[x_L, x_R] = [-0.6177,\, -0.6174]$ \\
+$y = A_{41}$ & $[y_L, y_R] = [-0.7794,\, -0.7789]$ \\
+$z = A_{51}$ & $[z_L, z_R] = [0.45322490,\, 0.45322501]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Write \(F=A^{(2)},G=A^{(3)},H=A^{(4)}\), indexing each stage from 1. Set
+Our main results are the following three statements.
 
+\begin{theorem}[Sharp local bound and attainment on $B$]\label{thm:box}
+Let $g_*$ be the unique real root in $[4,5]$ of the degree-61 benchmark
+polynomial $P_5$ of~\cite[eq.~(2.15)]{CEU2026}.
+\begin{enumerate}
+  \item Every matrix $A\in\mathcal{F}_{<}$ with $(A_{21},A_{41},A_{51})\in B$
+  satisfies $0 < p_5(A) < g_*$.
+  \item The local supremum is sharp:
+  \[
+    \sup\bigl\{p_5(A) : A\in\mathcal{F}_{<},\; (A_{21},A_{41},A_{51})\in B\bigr\} = g_*.
+  \]
+  \item There exists a full-equality matrix $A_*\in\mathcal{F}_{\le}$ with
+  $(A_{21},A_{41},A_{51})\in B$ and $r=1$ that attains $p_5(A_*)=g_*$.
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[Global necessary condition on $\mathcal{F}_{<}$]\label{thm:global}
+Every matrix $A\in\mathcal{F}_{<}$ satisfies $p_5(A)>0$. If $A\in\mathcal{F}_{<}$
+satisfies $p_5(A) > g_*$, then $0 < z < 1$ and
+\begin{equation}\label{eq:necessary}
+  (1+r)\bigl(2+z(1-z)\bigr) > g_*.
+\end{equation}
+In particular, any counterexample in $\mathcal{F}_{<}$ must satisfy
 \[
-a=1+x,\quad b=1+z,\quad q=2-z(x+z),\quad
-t=-z/y,\quad v=z(x+z)/a,\quad d=-1+xz,\quad e=1-xv.
+  r > \frac{4g_*}{9} - 1 \approx 0.83667
+  \qquad\text{and}\qquad
+  z(1-z) > \frac{g_*}{2} - 2 \approx 0.06626.
+\]
+\end{theorem}
+
+\begin{proposition}[Certified nonemptiness witness in $B$]\label{prop:witness}
+There exists an explicit matrix $A\in\mathcal{F}_{<}$ with
+$x = -386/625$, $z = 18129/40000$, and $y$ equal to the unique root in
+$(-0.779073,-0.779072)$ of the irreducible cubic polynomial~\eqref{eq:witness-cubic},
+whose stage-4 ratio and fifth pivot satisfy
+\begin{align*}
+  0.99993932046415197561 &< r < 0.99993932046415197562, \\
+  4.13246528187498059056 &< p_5 < 4.13246528187498059057.
+\end{align*}
+\end{proposition}
+
+The region of $\mathcal{F}_{<}$ outside the box $B$ that satisfies the
+necessary condition~\eqref{eq:necessary} remains open in this work.
+
+\section{Benchmark Isolation and Relaxed Witness}\label{sec:benchmark}
+
+The 62 integer coefficients of the degree-61 benchmark polynomial $P_5$
+archived in \path{pivot/p5_coefficients.txt} agree term by term with
+\cite[eq.~(2.15)]{CEU2026} and \texttt{Out[12]} of the authors' discriminant
+notebook~\cite{CEUCode}. Given an integer polynomial $f$ of degree $n$ and
+rationals $\alpha < \beta$, the M\"obius substitution
+$u = (\alpha + \beta t)/(1+t)$ maps $(0,\infty)$ bijectively onto
+$(\alpha,\beta)$ while preserving root multiplicities; clearing denominators
+yields an integer polynomial whose sign variations bound the root count on
+$(\alpha,\beta)$ by Descartes' rule of signs. Applying this exact substitution
+to $P_5$ certifies:
+\begin{itemize}
+  \item $1$ sign variation and opposite endpoint signs on $[4,5]$, hence a
+  unique root $g_*\in(4,5)$;
+  \item $0$ sign variations and nonzero endpoints on $[-5,0]$, hence no root
+  in $[-5,0]$;
+  \item $1$ sign variation and opposite endpoint signs on $[g_L,g_H]$, giving
+  the strict 30-digit rational bracket
+  \begin{equation}\label{eq:gstar-bracket}
+  \begin{aligned}
+    g_L &:= 4.132517078632472854223346853277 < g_* \\
+        &< 4.132517078632472854223346853278 =: g_H.
+  \end{aligned}
+  \end{equation}
+\end{itemize}
+
+As a verification control, the exact full-equality matrix at
+$x=y=-1/2$, $z=0$ has pivots $1,1,2,2,4$ and $r=1$. The exact checker
+(\texttt{pivot/verify.py}) accepts this control when $r=1$ is permitted,
+rejects it under the strict $r<1$ criterion, and rejects perturbed controls
+with a wrong prescribed entry or a stage-1 dominance violation.
+
+\begin{proof}[Proof of Proposition~\ref{prop:witness}]
+Set $x=-386/625=-0.6176$ and $z=18129/40000=0.453225$. Substituting into the
+parametric reconstruction of Section~\ref{sec:box-proof} and clearing
+denominators in the equation $H_{11}+H_{21}=0$ produces the primitive
+irreducible cubic polynomial
+\begin{equation}\label{eq:witness-cubic}
+\begin{aligned}
+  C(y) &= 3586674629163499482445312500000000000\,y^3 \\
+       &\quad - 22693677055802856449945261748450390625\,y^2 \\
+       &\quad - 21794053267721803248556940294525366975\,y \\
+       &\quad - 1509132804792772878470239805058936768.
+\end{aligned}
+\end{equation}
+Exact Sturm root counting certifies that $C$ is irreducible over $\mathbb{Q}$,
+is nonzero at $-0.779073$ and $-0.779072$, and has a unique real root
+$y_w \in (-0.779073,-0.779072)$.
+
+Working in the cubic number field $\mathbb{Q}[y]/(C(y))$ with exact rational
+interval refinement around $y_w$, the certificate (\texttt{pivot/verify.py},
+archived in \texttt{pivot/witness.json}) verifies that every denominator in
+the reconstruction is invertible modulo $C$, checks every entry of all five
+Schur stages against its independent bordered-determinant ratio from $A$,
+verifies all fourteen prescribed entries and all nine retained ties to be
+identically zero in $\mathbb{Q}[y]/(C(y))$, proves strict positivity of all
+five pivots and nonnegativity of both dominance slacks
+$|p_k|\pm A^{(k)}_{ij}\ge 0$ at every entry, and certifies $-1\le r<1$
+together with the stated 20-digit enclosures for $r$ and $p_5$.
+\end{proof}
+
+As an independent local check requiring no elimination or discriminant
+computation, direct rational interval arithmetic
+(\path{verification/pivot_subbox.py}) on the witness sub-box
+\[
+  [-0.6176001,\,-0.6175999]
+  \times [-0.779073,\,-0.779072]
+  \times [0.45322499,\,0.45322501]
+  \subset B
+\]
+certifies directly from the Schur formulas that every feasible point in that
+sub-box satisfies $4.132464 < p_5 < 4.132467 < g_L < g_*$.
+
+\section{Proof of the Local Upper Bound on the Box}\label{sec:box-proof}
+
+We now prove Part~1 of Theorem~\ref{thm:box}. Define the rational functions of
+$(x,y,z)$:
+\begin{equation}\label{eq:aux-vars}
+\begin{gathered}
+  a = 1+x,\qquad b = 1+z,\qquad q = 2-z(x+z),\\
+  t = -\frac{z}{y},\qquad v = \frac{z(x+z)}{a},\qquad d = -1+xz,\qquad e = 1-xv,
+\end{gathered}
+\end{equation}
+and set
+\[
+  k = \frac{q-za-y(z+v)}{e-d},\qquad u = \frac{b-q}{k}.
 \]
 
-For any retained-family matrix in the box, the four \(F\) ties give
-\(F_{11}=b\) and \(a_{22}=b+x,\ a_{32}=z,\ a_{14}=-z,\ a_{13}=t\). Thus
-\(F_{13}=d\). The \(G_{32}=-G_{11}\) tie gives \(G_{11}=q\) since
-\(G_{32}=F_{43}+F_{13}=-2+z(x+z)\). The \(G_{13}=-q\) tie gives
-\(-2+(1+x)a_{15}=-q\), hence \(a_{15}=v\) and \(F_{14}=e\).
-
-Set \(k=F_{31}/b\). The \(G_{21}=q\) tie gives \(kF_{12}=b-q\), and
-\(G_{11}=q\) gives \(F_{22}=q+F_{12}\). The retained equality
-\(H_{12}=H_{11}\) becomes
-
-\[
-1-yv-ke+q=1+yz-kd+za.
-\]
-
-It determines \(k=(q-za-y(z+v))/(e-d)\). With \(u=(b-q)/k\), the matrix
-is
-
-\[
-A=\begin{pmatrix}
-1&1&t&-z&v\\
-x&a+z&u+xt&-1&1\\
--1&z&q+u-t&-1&-1\\
-y&bk+y&1&1&1\\
-z&-1&1&-1&1
+\begin{lemma}[Reconstruction on $B$]\label{lem:reconstruct}
+Throughout the box $B$, the rational functions $a,b,e-d,k,q,H_{11}$ are
+strictly positive and $y$ is strictly negative. Every matrix
+$A\in\mathcal{F}_{\le}$ with $(A_{21},A_{41},A_{51})=(x,y,z)\in B$ is uniquely
+determined by $(x,y,z)$ as
+\begin{equation}\label{eq:reconstructed-A}
+A = \begin{pmatrix}
+  1 & 1 & t & -z & v \\
+  x & a+z & u+xt & -1 & 1 \\
+  -1 & z & q+u-t & -1 & -1 \\
+  y & bk+y & 1 & 1 & 1 \\
+  z & -1 & 1 & -1 & 1
 \end{pmatrix}.
-\]
+\end{equation}
+Conversely, for every $(x,y,z)\in B$, the matrix~\eqref{eq:reconstructed-A}
+has well-defined Schur complements $F,G,H$, satisfies all fourteen prescribed
+entries, all stage-2 and stage-3 ties, the stage-4 tie $H_{12}=H_{11}$, and
+strict pivot dominance at all non-tied entries of stages~$1,2,3$.
+\end{lemma}
 
-The interval checker verifies \(a,b,e-d,k,q,H_{11}>0\) and \(y<0\)
-throughout the box. This covers every denominator in the reconstruction.
-It also verifies the forward identities by substituting this matrix into
-the Schur updates. The reverse derivation above ensures the theorem
-covers any matrix satisfying the original ties with these \(x,y,z\).
-
-Set \(P=H_{11}+H_{21}\), \(D=H_{22}-H_{11}\), and \(W=H_{11}+H_{22}\).
-On \(P=0\), \(p_5=W\). The interval certificate verifies all stage-1
-through stage-3 dominance inequalities and \(W>0,\ P_x>0,\ P_y>0\) on
-the whole box. For every allowed \(z\), it encloses the \(P=0\) root at
-the left \(x\) endpoint in \([-0.778957,-0.778955]\) with \(D<0\)
-throughout that bracket. At the right \(x\) endpoint it encloses the
-root in \([-0.779307,-0.779304]\) with \(D>0\) throughout.
-
-At fixed \(z\), monotonicity in \(x\) propagates \(P<0\) from the
-right-face lower bracket endpoint to the entire low-\(y\) face. It
-propagates \(P>0\) from the left-face upper bracket endpoint to the
-entire high-\(y\) face. Since \(P_y>0\), the branch \(y(x)\) exists and
-is unique across the box. The implicit function theorem gives
-\(y'(x)=-P_x/P_y\). Rational interval arithmetic encloses
-\(D_x-D_yP_x/P_y\) in \((1.85,1.88)\) and \(W_x-W_yP_x/P_y\) in
-\((0.76,0.78)\).
-
-The branch crosses \(D=0\) exactly once, at some \(x_0\). Since
-\(H_{11}>0\), every relaxed point has \(D<0\) and lies to its left. At
-\(x_0\), the block \(H\) satisfies all three prescribed ties and stage-4
-dominance, and the earlier stages satisfy dominance by the interval
-checks. The following calculation bounds its pivot by \(g_*\), giving
-\(p_5=W(x)<W(x_0)\le g_*\).
-
-\subsection{Exact bound at full
-equality}\label{exact-bound-at-full-equality}
-
-At a comparator write \(g=W(x_0)\), \(s=-G_{12}\), \(w=G_{31}\), and
-\(c=G_{33}\). The Schur identities
-
+\begin{proof}
+Let $A\in\mathcal{F}_{\le}$ have $(A_{21},A_{41},A_{51})=(x,y,z)\in B$.
+Directly from $F_{ij}=A_{i+1,j+1}-A_{i+1,1}A_{1,j+1}$ and~\eqref{eq:template},
+$F_{41}=-1-z=-b$. The four stage-2 ties give:
+\begin{itemize}
+  \item $F_{41}=-F_{11} \implies F_{11}=b$, so $a_{22}=F_{11}+x=a+z$;
+  \item $F_{21}=F_{11} \implies a_{32}+1=1+z$, so $a_{32}=z$;
+  \item $F_{23}=-F_{11} \implies -1+a_{14}=-(1+z)$, so $a_{14}=-z$ and
+  hence $F_{13}=-1-xa_{14}=d$;
+  \item $F_{32}=F_{11} \implies 1-ya_{13}=1+z$, so $a_{13}=-z/y=t$ (since $y<0$ on $B$).
+\end{itemize}
+At stage~3, using $F_{11}=b>0$ and $F_{21}=b$, $F_{41}=-b$, we have
+$G_{32}=F_{43}+F_{13}=(-1+z^2)+(-1+xz)=-2+z(x+z)$, so the tie
+$G_{32}=-G_{11}$ forces $G_{11}=q$. Next,
+$G_{13}=F_{24}-F_{14}=-2+(1+x)a_{15}$, so the tie $G_{13}=-q$ gives
+$a_{15}=z(x+z)/a=v$ (since $a>0$ on $B$) and hence $F_{14}=1-xv=e$.
+Writing $k:=F_{31}/b$, the ties $G_{21}=q$ and $G_{11}=q$ give
+$kF_{12}=b-q$ and $F_{22}=q+F_{12}$. Finally, at stage~4,
+$G_{12}=-b-d=-za$, so the retained tie $H_{12}=H_{11}$ reads
 \[
-H_{21}=-q+sw/q,\qquad H_{22}=c+w
+  1 - yv - ke + q = 1 + yz - kd + za,
 \]
+which determines $k=(q-za-y(z+v))/(e-d)$ and $F_{12}=u=(b-q)/k$, yielding the
+entries $a_{23}=u+xt$, $a_{33}=q+u-t$, and $a_{42}=bk+y$ of~\eqref{eq:reconstructed-A}.
 
-and \(H_{11}=H_{22}=-H_{21}=g/2\) give \((q+s)g/2=q^2+sc\). The
-expressions \(s=z(1+x)\) and \(c=2-(x+z)v\) give \(q+s=2+z-z^2\) and
-\(q^2+sc=4+2z(1-x-2z)\). Since \(z>0\) on the box, this determines
-
+In the forward direction, exact symbolic substitution (\texttt{pivot/region.py})
+verifies that~\eqref{eq:reconstructed-A} produces the compact Schur
+complements
+\begin{align*}
+F &= \begin{pmatrix}
+  b & u & d & e \\
+  b & q+u & -b & -1+v \\
+  bk & b & 1+yz & 1-yv \\
+  -b & 1-zt & -1+z^2 & 1-zv
+\end{pmatrix}, &
+G &= \begin{pmatrix}
+  q & -za & -q \\
+  q & 1+yz-kd & 1-yv-ke \\
+  1-zt+u & -q & 2-(x+z)v
+\end{pmatrix},
+\end{align*}
+and
 \[
-x=1-2z+2/z-\frac{g(2+z-z^2)}{4z}.
+H = \begin{pmatrix}
+  G_{22}-G_{12} & G_{23}+q \\
+  -q - G_{31}G_{12}/q & G_{33}+G_{31}
+\end{pmatrix},
 \]
+and satisfies all stage-2 and stage-3 ties together with $H_{12}=H_{11}$.
+Exact rational interval arithmetic (\texttt{pivot/region.py}, archived in
+\texttt{pivot/region.json}) proves $a,b,e-d,k,q,H_{11}>0$ and $y<0$ throughout
+$B$, so every rational expression is $C^\infty$ on an open neighborhood of $B$.
+Applying the mean-value interval enclosure to every non-identically-zero slack
+$A^{(k)}_{11}\pm A^{(k)}_{ij}$ for $k=1,2,3$ certifies that all stage-1
+through stage-3 dominance inequalities hold on all of $B$.
+\end{proof}
 
-The reconstruction gives \(H_{11}=1+s+yz-kd\), affine in \(y\) for fixed
-\(x,z\). The interval check proves its \(y\)-coefficient is positive on
-the box, so \(H_{11}=g/2\) determines \(y\) rationally in \(g,z\). The
-remaining identity \(w=1+z^2/y+(b-q)/k=g/2-c\) gives an integer
-polynomial \(E(g,z)=0\) after multiplication by
-\(-1024z^4(z-1)^2 a k y\) and substitution of these expressions for
-\(x,y\). All divisions are defined by the box checks and \(z>0\). The
-checker derives \(E\) from these identities, archives all its
-coefficients, verifies \(\deg_z E=10,\ \deg_g E=7\), and recomputes
-
+Define on $B$ the three smooth functions
 \[
-\operatorname{Disc}_z E
-=-295147905179352825856\,(g-6)(g-4)^{32}(g-2)^6(g^2-12g+40)P_5(g).
+  P := H_{11}+H_{21},\qquad D := H_{22}-H_{11},\qquad W := H_{11}+H_{22}.
 \]
-
-This agrees with equation (2.14), and the benchmark polynomial is
-cross-checked against the authors' notebook. The derived polynomial is
-used in the root checks. In the rendered TeX for equation (2.13), the
-\(z^0\) row of the large factor has an extra \(+97792g\) before
-\(+229376g\) compared with the derived polynomial. The extra term is
-absent from the calculation here.
-\href{https://arxiv.org/html/2602.20390v2}{Paper, equations
-(2.13)--(2.15)} ·
-\href{https://github.com/jamiecjx/growth-5x5/blob/bd6d13af571d0c454178dac24e753f7cac7a3727/n\%3D5_discriminant.nb}{Authors'
-pinned discriminant notebook, Out{[}12{]}}
-
-Let \(g_L\) be the rational lower endpoint in the benchmark bracket and
-\(g_U=4.14\). The interval checker gives \(W<g_U\) on the whole box. At
-both rational \(z\) endpoints of the box, Descartes' rule certifies that
-\(E(g,z)\) has no root for \(g\in[g_L,g_U]\). It also excludes roots of
-the leading coefficient in \(z\) on that interval and roots of
-\(E(g_U,z)\) on the closed \(z\) interval. A Sturm count independently
-checks the last fiber.
-
-If a comparator had \(g>g_*\), the zero set of \(E\) in this closed
-rectangle would be nonempty. By compactness it has a point of largest
-\(g\). This point has \(g_*\!<g<g_U\) and interior \(z\) by the face
-checks. The computed discriminant is nonzero there, because \(P_5\) has
-just one root on \([4,5]\) and the remaining factors have none on
-\((g_*,g_U)\). The leading coefficient is nonzero, so
-\(\partial E/\partial z\ne 0\) at that root. The implicit function
-theorem continues the root to slightly larger \(g\) inside the
-rectangle, a contradiction. This gives the comparator bound directly.
-
-The local relaxed family has supremum \(g_*\), approached as \(r\) tends
-to 1. The separate attainment certificate gives the lower comparison on
-the closure.
-
-\section{A necessary condition over the full
-family}\label{a-necessary-condition-over-the-full-family}
-
-This argument uses the stage entries directly, including at zeros of
-reconstruction denominators. Normalization gives \(x,z\in[-1,1]\) and
-\(a_{22}=1+x+z\in[-1,1]\). The retained ties yield
-\(F_{11}=b=1+z,\ G_{11}=q=2-z(x+z)\), and \(G_{12}=-z(1+x)\) without
-dividing by \(1+x,y,e-d\), or \(k\). Since \(b\ne0\) and
-\(x+z\in[-2,0]\), both \(b\) and \(q\) are positive.
-
-Write \(s=G_{31}\). The ties \(G_{32}=-q\) and \(H_{21}=-H_{11}\) give
-
+Because $H_{12}=H_{11}$ identically on $B$, whenever $P=0$ (i.e., $H_{21}=-H_{11}$)
+the fifth pivot is
 \[
-H_{11}=q+sG_{12}/q>0.
+  p_5 = H_{22} - \frac{H_{21}H_{12}}{H_{11}} = H_{22} + H_{11} = W.
 \]
 
-Nonnegativity follows from \(|s|,|G_{12}|\le q\), and the pivot is
-nonzero. Thus \(p_5=(1+r)H_{11}\). For \(z\ge0\),
-\(H_{11}\le q+|G_{12}|=2+z(1-z)\). For \(z\le0\), \(q\le2\) and
-\(0\le G_{12}\le q\). The identities \(F_{22}=q+F_{12}\) and
-\(s=1-za_{13}+F_{12}\), together with \(F_{22}\le b\) and
-\(|a_{13}|\le1\), give \(s\le1+|z|+b-q=2-q\). Hence \(H_{11}\le2\) for
-\(z\le0\). The bound at \(z=1\) also gives \(H_{11}\le2\). These regimes
-have \(p_5<4\). In particular, a counterexample requires \(r>4g_*/9-1\),
-approximately \(0.83667\), and \(z(1-z)>g_*/2-2\).
+\begin{lemma}[Unique $P=0$ branch and strict comparator reduction]\label{lem:branch}
+For each fixed $z\in[z_L,z_R]$:
+\begin{enumerate}
+  \item There is a unique function $y(\cdot,z)\colon [x_L,x_R]\to (y_L,y_R)$
+  such that $P(x,y(x,z),z)=0$. It is $C^\infty$ on $[x_L,x_R]\times[z_L,z_R]$
+  with $\partial y/\partial x = -P_x/P_y$.
+  \item Both $\tilde{D}(x):=D(x,y(x,z),z)$ and $\tilde{W}(x):=W(x,y(x,z),z)$
+  are strictly increasing in $x$ on $[x_L,x_R]$, and $\tilde{W}(x)>0$.
+  \item There is a unique $x_0(z)\in(x_L,x_R)$ such that $\tilde{D}(x_0(z))=0$.
+  The point $(x_0(z),y(x_0(z),z),z)\in B$ defines a full-equality matrix in
+  $\mathcal{F}_{\le}$ with fifth pivot $g(z):=\tilde{W}(x_0(z))=2H_{11}$.
+  \item Every matrix $A\in\mathcal{F}_{<}$ with $(x,y,z)\in B$ satisfies
+  $y=y(x,z)$, $x<x_0(z)$, and $0 < p_5(A) = \tilde{W}(x) < g(z)$.
+\end{enumerate}
+\end{lemma}
 
-\section{Sharpness of the local
-supremum}\label{sharpness-of-the-local-supremum}
+\begin{proof}
+The exact rational interval certificate (\texttt{pivot/region.py}) establishes
+$W>0$, $P_x>0$, and $P_y>0$ throughout $B$, and verifies the following
+face enclosures for every $z\in[z_L,z_R]$:
+\begin{itemize}
+  \item At $x=x_L=-0.6177$: $P(x_L,-0.778957,z)<0$,
+  $P(x_L,-0.778955,z)>0$, and $D(x_L,y,z)<0$ for all
+  $y\in[-0.778957,-0.778955]$.
+  \item At $x=x_R=-0.6174$: $P(x_R,-0.779307,z)<0$,
+  $P(x_R,-0.779304,z)>0$, and $D(x_R,y,z)>0$ for all
+  $y\in[-0.779307,-0.779304]$.
+\end{itemize}
+Fix $z\in[z_L,z_R]$ and any $x\in[x_L,x_R]$. Because $P_x>0$ and $P_y>0$ on
+$B$ and $y_L=-0.7794 < -0.779307$ while $y_R=-0.7789 > -0.778955$,
+monotonicity in $x$ and $y$ gives
+\begin{align*}
+  P(x,y_L,z) &\le P(x_R,y_L,z) < P(x_R,-0.779307,z) < 0, \\
+  P(x,y_R,z) &\ge P(x_L,y_R,z) > P(x_L,-0.778955,z) > 0.
+\end{align*}
+By the intermediate value theorem and $P_y>0$, there exists a unique
+$y(x,z)\in(y_L,y_R)$ solving $P(x,y(x,z),z)=0$. By the implicit function
+theorem, $y(x,z)$ is $C^\infty$ with $\partial y/\partial x=-P_x/P_y$.
 
-In the rational box in the pivot proof, the retained family with
-\(-1\le r<1\) has supremum \(g_*\). Allowing \(r=1\) gives a matrix in
-the same box that attains \(g_*\).
+Differentiating along $y(x,z)$ yields
+$\tilde{D}'(x) = D_x - D_y P_x/P_y$ and $\tilde{W}'(x) = W_x - W_y P_x/P_y$.
+Exact rational interval arithmetic encloses these derivatives on all of $B$ in
+\[
+  D_x - D_y\frac{P_x}{P_y} \in (1.85,\, 1.88),
+  \qquad
+  W_x - W_y\frac{P_x}{P_y} \in (0.76,\, 0.78),
+\]
+proving Part~2. At $x=x_L$ the root $y(x_L,z)$ lies in $(-0.778957,-0.778955)$
+where $D<0$, so $\tilde{D}(x_L)<0$; at $x=x_R$ the root $y(x_R,z)$ lies in
+$(-0.779307,-0.779304)$ where $D>0$, so $\tilde{D}(x_R)>0$. Strict
+monotonicity of $\tilde{D}$ gives a unique zero $x_0(z)\in(x_L,x_R)$. At
+$(x_0(z),y(x_0(z),z),z)$, stage~4 satisfies $H_{11}>0$, $H_{12}=H_{11}$,
+$H_{21}=-H_{11}$, and $H_{22}=H_{11}$, so all ties and dominance bounds hold
+at all stages (by Lemma~\ref{lem:reconstruct}), proving Part~3.
 
-For a fixed \(z\), let \((x_0(z),y_0(z))\) be the unique point in the
-box where both \(P=H_{11}+H_{21}\) and \(D=H_{22}-H_{11}\) vanish. The
-interval proof gives opposite endpoint signs for \(D\) along \(P=0\),
-together with \(P_y>0\) and \(D_x-D_yP_x/P_y>0\). Hence the point is
-interior in both \(x\) and \(y\). These inequalities make the Jacobian
-of \((D,P)\) with respect to \((x,y)\) invertible. The implicit function
-theorem and uniqueness give a continuous comparator curve on the closed
-\(z\)-interval and a continuously differentiable curve in its interior.
+Finally, any matrix $A\in\mathcal{F}_{<}$ with $(x,y,z)\in B$ satisfies $P=0$,
+hence $y=y(x,z)$, and satisfies $r=H_{22}/H_{11}<1$. Because $H_{11}>0$, this
+means $\tilde{D}(x)=D(x,y(x,z),z)<0=\tilde{D}(x_0(z))$, so $x<x_0(z)$ and
+$0<p_5(A)=\tilde{W}(x)<\tilde{W}(x_0(z))=g(z)$.
+\end{proof}
 
-Set \(g(z)=2H_{11}\) on this curve. The exact interval bounds give
-\(4.13<g(z)<4.14\), and elimination gives \(E(g(z),z)=0\). The two
-endpoint polynomials \(E(g,z)\) at \(z=0.45322490\) and \(z=0.45322501\)
-each have one root in \((4.13,4.14)\), both below
-\(4.13251707863247283\). At the interior rational value \(z=0.45322491\)
-the unique root in that range is above the same cut. These are exact
-root counts with every interval endpoint checked to be nonzero. \href{https://github.com/claude-make-no-mistakes/fifth-pivot-local-optimality/blob/main/verification/pivot_attainment.py}{Root comparison checker}
+\begin{proposition}[Exact bound at full equality]\label{prop:comparator}
+For every $z\in[z_L,z_R]$, the comparator pivot satisfies $g(z)\le g_*$.
+\end{proposition}
 
-Thus \(g(z)\) attains its maximum at an interior point \(z_0\). There
-\(g'(z_0)=0\), so differentiating \(E(g(z),z)=0\) gives
-\(E_z(g(z_0),z_0)=0\). The leading coefficient of \(E\) in \(z\) is
-\((g-8)(g-6)(g-4)^2(g-2)(g^2-12g+40)\), which is nonzero throughout
-\((4.13,4.14)\). The multiple root in \(z\) therefore forces the
-discriminant to vanish. Its only root in \((4.13,4.14)\) is \(g_*\), so
-\(g(z_0)=g_*\). At the comparator all pivot comparisons hold, including
-the final equality \(r=1\). \href{https://github.com/claude-make-no-mistakes/fifth-pivot-local-optimality/blob/main/pivot/comparator.py}{Discriminant checker}
+\begin{proof}
+At a comparator $(x_0(z),y_0(z),z)\in B$, write $g=g(z)$, $s=-G_{12}=za$,
+$w=G_{31}$, and $c=G_{33}=2-(x+z)v$. From the stage-4 Schur formulas
+\[
+  H_{21} = -q + \frac{sw}{q},\qquad H_{22} = c + w,
+\]
+and the full-equality relations $H_{11}=H_{22}=-H_{21}=g/2$, we obtain
+$w=g/2-c$ and hence $(q+s)(g/2)=q^2+sc$. Direct simplification gives
+$q+s = 2+z-z^2$ and $q^2+sc = 4+2z(1-x-2z)$. Since $z>0$ on $B$, this uniquely
+determines
+\begin{equation}\label{eq:recover-x}
+  x = 1 - 2z + \frac{2}{z} - \frac{g(2+z-z^2)}{4z}.
+\end{equation}
+Next, $H_{11}=1+s+yz-kd$ is affine in $y$ for fixed $(x,z)$ because
+$k=(q-za-y(z+v))/(e-d)$ is affine in $y$ while $s,d,e,q,a,v$ do not depend on
+$y$. Writing $H_{11}=\alpha(x,z)+\beta(x,z)y$, the interval certificate
+(\texttt{pivot/comparator.py}) verifies $\beta>0$ throughout $B$, so
+$H_{11}=g/2$ uniquely recovers $y=(g/2-\alpha(x,z))/\beta(x,z)$ as a rational
+function of $(g,z)$ upon substituting~\eqref{eq:recover-x}.
 
-At fixed \(z_0\), take points on \(P=0\) with \(x<x_0(z_0)\) tending to
-\(x_0(z_0)\). They remain in the box. The verified strict increase of
-\(D\) makes \(r<1\) there, and continuity makes \(r>-1\) sufficiently
-close to the comparator. The two retained off-diagonal ties and this
-ratio ensure stage-four dominance. The first three stages already
-satisfy their dominance bounds throughout the box. Their fifth pivots
-approach \(g_*\) from below because the fifth pivot is strictly
-increasing with \(x\) along \(P=0\). This gives sharpness over the
-stated open family.
+Substituting these rational expressions for $x$ and $y$ into the remaining
+identity $w = 1 + z^2/y + (b-q)/k = g/2 - c$ and multiplying by
+$-1024\,z^4(z-1)^2 aky$ (every factor of which is well-defined and finite at
+the comparator because $z\in[z_L,z_R]\subset(0,1)$ and $a,k,-y,\beta,e-d>0$
+on $B$) yields an integer polynomial equation $E(g,z)=0$. The checker
+(\texttt{pivot/comparator.py}, archived in \texttt{pivot/comparator.json})
+derives $E$ directly from these Schur identities, verifies
+$\deg_z E = 10$ and $\deg_g E = 7$, checks that the leading coefficient in $z$
+is
+\begin{equation}\label{eq:leading-z}
+  \operatorname{lc}_z E(g) = (g-8)(g-6)(g-4)^2(g-2)(g^2-12g+40),
+\end{equation}
+and computes the exact polynomial discriminant in $z$:
+\begin{equation}\label{eq:discriminant}
+  \operatorname{Disc}_z E(g)
+  = -295147905179352825856\,(g-6)(g-4)^{32}(g-2)^6(g^2-12g+40)P_5(g),
+\end{equation}
+matching~\cite[eq.~(2.14)]{CEU2026}.
 
-\section{Computational
-reproducibility}\label{computational-reproducibility}
+Let $g_U := 4.14$ and consider the compact rectangle
+$R := [g_L,g_U]\times[z_L,z_R]$, where $g_L$ is the rational lower bound
+in~\eqref{eq:gstar-bracket}. The interval certificate establishes
+$4.13 < W < g_U$ throughout $B$, so $g(z)<g_U$ for every $z\in[z_L,z_R]$.
+Exact M\"obius substitutions and Descartes' rule (checked in both Python and
+Lean~4) certify:
+\begin{itemize}
+  \item $E(g,z_L)$ and $E(g,z_R)$ each have no root for $g\in[g_L,g_U]$;
+  \item $\operatorname{lc}_z E(g)$ has no root for $g\in[g_L,g_U]$;
+  \item $E(g_U,z)$ has no root for $z\in[z_L,z_R]$ (independently cross-checked
+  by a Sturm count).
+\end{itemize}
 
-The companion repository includes replay commands, exact input data, and
-source code. AI assistance was used to develop and check the arguments
-and the software. This working paper reports the stated restricted
-results.
+Suppose for contradiction that $g(\hat z) > g_*$ for some
+$\hat z\in[z_L,z_R]$. Then $(g(\hat z),\hat z)$ lies in the compact zero set
+$Z := \{(g,z)\in R : E(g,z)=0\}$, so $Z$ is nonempty and contains a point
+$(g_{\max},z_{\max})$ maximizing $g$. Necessarily
+$g_* < g(\hat z) \le g_{\max} \le g_U$. By the face exclusions above,
+$g_{\max}<g_U$ and $z_L < z_{\max} < z_R$. Moreover, because $P_5$ has a
+unique root $g_*$ on $[4,5]$ and the remaining factors in~\eqref{eq:discriminant}
+have no root on $(4,5)$ (note $g^2-12g+40=(g-6)^2+4>0$), we have
+$\operatorname{Disc}_z E(g_{\max})\ne 0$. Since
+$\operatorname{lc}_z E(g_{\max})\ne 0$ as well, the univariate polynomial
+$z\mapsto E(g_{\max},z)$ has exact degree $10$ and no multiple roots, so
+$\partial E/\partial z(g_{\max},z_{\max})\ne 0$. By the implicit function
+theorem, the zero locus of $E$ continues smoothly as $z=z(g)$ to values
+$g > g_{\max}$ inside $R$, contradicting the maximality of $g_{\max}$.
+Hence $g(z)\le g_*$ for all $z\in[z_L,z_R]$.
+\end{proof}
+
+Combining Lemma~\ref{lem:branch}(4) and Proposition~\ref{prop:comparator}
+proves Part~1 of Theorem~\ref{thm:box}: every $A\in\mathcal{F}_{<}$ in $B$
+satisfies $0 < p_5(A) < g(z) \le g_*$.
+
+\begin{remark}\label{rem:typo}
+In the rendered TeX for equation~(2.13) of~\cite{CEU2026}, the $z^0$ row of
+the large factor contains an extra $+97792g$ preceding $+229376g$ relative to
+the derived eliminant $E(g,z)$ archived in \texttt{pivot/comparator.json}. Our
+proof uses only the polynomial $E(g,z)$ derived directly from the Schur
+identities and verifies its discriminant~\eqref{eq:discriminant} directly
+against $P_5$.
+\end{remark}
+
+\section{Sharpness and Attainment}\label{sec:sharpness}
+
+We now prove Parts~2 and~3 of Theorem~\ref{thm:box}.
+
+\begin{proof}[Proof of Parts~2 and~3 of Theorem~\ref{thm:box}]
+For each $z\in[z_L,z_R]$, Lemma~\ref{lem:branch} gives a unique point
+$(x_0(z),y_0(z))\in(x_L,x_R)\times(y_L,y_R)$ where $P=0$ and $D=0$. The
+Jacobian determinant of $(D,P)$ with respect to $(x,y)$ is
+\[
+  \det\begin{pmatrix} D_x & D_y \\ P_x & P_y \end{pmatrix}
+  = P_y\left(D_x - D_y\frac{P_x}{P_y}\right) > 0
+\]
+throughout $B$. Since $P$ and $D$ are $C^\infty$ on an open neighborhood of
+$B$ and $(x_0(z),y_0(z))$ is strictly interior in $(x,y)$, the implicit
+function theorem and uniqueness in $B$ imply that $z\mapsto (x_0(z),y_0(z))$
+is $C^\infty$ on $[z_L,z_R]$. Consequently, the comparator pivot
+$g(z)=2H_{11}(x_0(z),y_0(z),z)$ is continuous on $[z_L,z_R]$ and $C^1$ on
+$(z_L,z_R)$, satisfies $4.13 < g(z) < 4.14$ (from the box enclosure of $W$),
+and satisfies $E(g(z),z)=0$ for all $z\in[z_L,z_R]$.
+
+Set $c := 4.13251707863247283$ and $z_M := 0.45322491 \in (z_L,z_R)$. Exact
+Sturm counts (checked in \path{verification/pivot_attainment.py}) and exact
+Descartes sign variations (checked in Lean~4 by \texttt{attainment\_fibers})
+certify that for each $z\in\{z_L,z_M,z_R\}$, the univariate polynomial
+$g\mapsto E(g,z)$ is nonzero at $4.13$, $c$, and $4.14$ and has a unique real
+root in $(4.13,4.14)$, with:
+\begin{itemize}
+  \item the unique root at $z=z_L=0.45322490$ lying in $(4.13,c)$;
+  \item the unique root at $z=z_R=0.45322501$ lying in $(4.13,c)$;
+  \item the unique root at $z=z_M=0.45322491$ lying in $(c,4.14)$.
+\end{itemize}
+Therefore $g(z_L) < c < g(z_M)$ and $g(z_R) < c < g(z_M)$.
+
+By continuity on $[z_L,z_R]$, $g(z)$ attains its maximum at some interior
+point $z_0\in(z_L,z_R)$. At $z_0$ we have $g'(z_0)=0$, so differentiating
+$E(g(z),z)=0$ gives
+\[
+  \frac{\partial E}{\partial g}(g(z_0),z_0)\,g'(z_0)
+  + \frac{\partial E}{\partial z}(g(z_0),z_0) = 0
+  \implies \frac{\partial E}{\partial z}(g(z_0),z_0) = 0.
+\]
+Thus $z_0$ is a multiple root of $z\mapsto E(g(z_0),z)$. Because
+$\operatorname{lc}_z E(g)$ in~\eqref{eq:leading-z} has no root in
+$(4.13,4.14)$, the discriminant~\eqref{eq:discriminant} must vanish at
+$g(z_0)$. Its unique root in $(4.13,4.14)$ is $g_*$, so $g(z_0)=g_*$. The
+corresponding matrix $A_*\in\mathcal{F}_{\le}$ at $(x_0(z_0),y_0(z_0),z_0)\in B$
+satisfies all pivot inequalities and ties (including $r=1$) and attains
+$p_5(A_*)=g_*$, proving Part~3.
+
+For Part~2, fix $z=z_0$ and consider the points $(x,y(x,z_0),z_0)\in B$ with
+$x < x_0(z_0)$ approaching $x_0(z_0)$ from below. By Lemma~\ref{lem:branch},
+these points lie in $B$, satisfy $P=0$ (hence $H_{21}=-H_{11}$) and $D<0$
+(hence $r=H_{22}/H_{11}<1$), and satisfy all stage-1 through stage-3 dominance
+inequalities together with $H_{12}=H_{11}$ and $H_{11}>0$. By continuity,
+$r\to 1$ as $x\uparrow x_0(z_0)$, so $-1\le r<1$ (and hence stage-4 dominance)
+holds for all $x$ sufficiently close to $x_0(z_0)$. Because $W(x,y(x,z_0),z_0)$
+is continuous and strictly increasing in $x$, we have $p_5(x)\uparrow g(z_0)=g_*$,
+establishing $\sup\{p_5(A): A\in\mathcal{F}_{<},\, (x,y,z)\in B\}=g_*$.
+\end{proof}
+
+\section{Necessary Condition Over the Full Relaxed Family}\label{sec:global}
+
+We now prove Theorem~\ref{thm:global} directly from the stage entries, without
+assuming any of the local reconstruction denominators $1+x$, $y$, $e-d$, or $k$
+are nonzero.
+
+\begin{proof}[Proof of Theorem~\ref{thm:global}]
+Let $A\in\mathcal{F}_{<}$. Stage-1 normalization gives $x,z\in[-1,1]$ and
+$|a_{13}|\le 1$. From the prescribed entries~\eqref{eq:template},
+$F_{41}=-1-z$, so the tie $F_{41}=-F_{11}$ yields $F_{11}=b:=1+z$ and hence
+$a_{22}=F_{11}+x=1+x+z$. Stage-1 dominance $|a_{22}|\le 1$ gives
+$x+z\in[-2,0]$. Since $b=F_{11}$ is a nonzero pivot and $z\in[-1,1]$, we have
+$b>0$ (so $z>-1$).
+
+Using only division by $F_{11}=b>0$, the ties $F_{23}=-b$, $F_{21}=b$, and
+$F_{41}=-b$ yield $a_{14}=-z$, $F_{13}=-1+xz$, $F_{43}=-1+z^2$, and hence
+\[
+  G_{12} = F_{23} - F_{13} = -z(1+x),
+  \qquad
+  G_{32} = F_{43} + F_{13} = -2 + z(x+z).
+\]
+The tie $G_{32}=-G_{11}$ gives $G_{11}=q:=2-z(x+z)$. If $z\ge 0$, then
+$x+z\le 0$ implies $z(x+z)\le 0$ and thus $q\ge 2>0$; if $-1<z<0$, then
+$x+z\ge -2$ implies $z(x+z) = (-z)(-(x+z)) < 1\cdot 2 = 2$ and thus $q>0$.
+Hence $q>0$ in all cases.
+
+Set $w := G_{31}$. Since $G_{32}=-q$, the stage-4 Schur update gives
+$H_{21}=-q - wG_{12}/q$, and the tie $H_{21}=-H_{11}$ gives
+\[
+  H_{11} = q + \frac{wG_{12}}{q}.
+\]
+Stage-3 dominance yields $|w|\le q$ and $|G_{12}|\le q$, so
+$|wG_{12}/q|\le q$ and $H_{11}\ge 0$. Because $H_{11}$ is a nonzero pivot,
+$H_{11}>0$. Using $H_{12}=H_{11}$, $H_{21}=-H_{11}$, and $H_{22}=rH_{11}$, the
+fifth pivot is
+\[
+  p_5 = H_{22} - \frac{H_{21}H_{12}}{H_{11}} = (1+r)H_{11}.
+\]
+Since $r\ge -1$, $H_{11}>0$, and $p_5\ne 0$, we have $p_5>0$ (so $|p_5|=p_5$).
+
+We now bound $H_{11}$ in two cases:
+\begin{itemize}
+  \item \emph{Case $z\ge 0$.} Because $1+x\ge 0$ and $z\ge 0$, we have
+  $|G_{12}| = z(1+x)$. Since $|w|/q\le 1$,
+  \[
+    H_{11} \le q + |G_{12}| = \bigl(2 - z(x+z)\bigr) + z(1+x) = 2 + z(1-z).
+  \]
+  At $z=1$ or $z=0$, this gives $H_{11}\le 2$ and hence
+  $p_5=(1+r)H_{11} < 2\cdot 2 = 4 < g_*$.
+
+  \item \emph{Case $-1<z\le 0$.} Since $z\le 0$ and $x+z\le 0$, we have
+  $z(x+z)\ge 0$, so $q\le 2$. Moreover $G_{12}=-z(1+x)\ge 0$, so stage-3
+  dominance gives $0\le G_{12}/q \le 1$. From $F_{21}=b$ and $F_{41}=-b$, the
+  stage-3 updates give $q = G_{11} = F_{22}-F_{12}$ and
+  $w = G_{31} = F_{42}+F_{12} = 1 - za_{13} + F_{12}$. Combining
+  $F_{22}\le b$ (stage-2 dominance) and $|a_{13}|\le 1$ (stage-1 dominance)
+  with $|z|=-z$ gives
+  \[
+    w = 1 - za_{13} + F_{22} - q \le 1 + |z| + b - q = 1 - z + (1+z) - q = 2 - q.
+  \]
+  Since $G_{12}/q\ge 0$, $w\le 2-q$, and $2-q\ge 0$ with $G_{12}/q\le 1$, we
+  obtain
+  \[
+    H_{11} = q + w\frac{G_{12}}{q} \le q + (2-q)\frac{G_{12}}{q} \le q + (2-q) = 2.
+  \]
+  Consequently $p_5 = (1+r)H_{11} < 4 < g_*$.
+\end{itemize}
+
+Therefore any matrix $A\in\mathcal{F}_{<}$ with $p_5(A)>g_*$ (note $g_*>4$)
+must have $0<z<1$ and satisfy
+\[
+  g_* < p_5 = (1+r)H_{11} \le (1+r)\bigl(2+z(1-z)\bigr),
+\]
+establishing~\eqref{eq:necessary}. Finally, since $1+r>0$ and
+$2+z(1-z)\le 9/4$ on $(0,1)$,~\eqref{eq:necessary} implies
+$g_* < \frac{9}{4}(1+r)$, i.e., $r > 4g_*/9 - 1 \approx 0.83667$; and since
+$1+r<2$ and $2+z(1-z)>0$,~\eqref{eq:necessary} also implies
+$2+z(1-z)>g_*/2$, i.e., $z(1-z) > g_*/2 - 2 \approx 0.06626$.
+\end{proof}
+
+\section{Computational Verification and Formalization}\label{sec:repro}
+
+All algebraic identities, exact rational interval enclosures, symbolic
+eliminations, discriminant factorizations, and real-root isolations are
+reproduced by running \texttt{python3 -B replay.py} (Python~3.12,
+SymPy~1.14.0) from the companion repository. The replay script checks SHA-256
+hashes of the frozen problem specification, benchmark coefficients, and
+verifier (\path{verification/FROZEN.sha256}), regenerates and compares all
+archived JSON certificates (\texttt{baseline.json}, \texttt{witness.json},
+\texttt{region.json}, \texttt{comparator.json}), runs the witness sub-box
+check (\path{verification/pivot_subbox.py}) and attainment root-count
+check (\path{verification/pivot_attainment.py}), and verifies that the
+integer polynomial inputs in the Lean formalization match the archived
+benchmark and derived eliminant (\path{verification/check_lean_inputs.py}).
+
+In addition, Lean~4.34.1 formally checks the two files
+\path{formalization/RatioBound.lean} and
+\path{formalization/BenchmarkSigns.lean} with zero \texttt{sorry}s and only
+standard axioms, verifying:
+\begin{itemize}
+  \item the rational order-arithmetic deductions behind~\eqref{eq:necessary}
+  and the strict comparator inequality $p_5 < g(z) \le g_*$;
+  \item all exact integer M\"obius-transformed sign variations and endpoint
+  signs for the benchmark brackets $[4,5]$ and $[g_L,g_H]$, the four
+  comparator rectangle face and leading-coefficient exclusions, and the
+  attainment fiber crossings at $z_L$, $z_M$, and $z_R$.
+\end{itemize}
+The symbolic derivation of the eliminant $E$ and its discriminant, Descartes'
+rule bridging sign variations to real roots, and the real-variable calculus
+arguments (implicit function theorem and compactness) are verified in Python
+and the proofs above.
+
+\begin{thebibliography}{2}
+
+\bibitem{CEU2026}
+J.~Chen, A.~Edelman, and J.~C.~Urschel,
+IMA Journal of Numerical Analysis (2026),
+\href{https://doi.org/10.1093/imanum/drag039}{doi:10.1093/imanum/drag039},
+\href{https://arxiv.org/abs/2602.20390}{arXiv:2602.20390v2}.
+
+\bibitem{CEUCode}
+J.~Chen, A.~Edelman, and J.~C.~Urschel,
+Companion exact computation repository (\texttt{growth-5x5}, pinned commit
+\texttt{bd6d13af}),
+\href{https://github.com/jamiecjx/growth-5x5/tree/bd6d13af571d0c454178dac24e753f7cac7a3727}{\path{github.com/jamiecjx/growth-5x5}}.
+
+\end{thebibliography}
 
 \end{document}
